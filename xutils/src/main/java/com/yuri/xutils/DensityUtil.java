@@ -1,7 +1,12 @@
 package com.yuri.xutils;
 
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.res.Resources;
+import android.os.Build;
+import android.util.DisplayMetrics;
+import android.view.Display;
+import android.view.WindowManager;
 
 import java.lang.reflect.Field;
 
@@ -95,5 +100,37 @@ public class DensityUtil {
 			e.printStackTrace();
 		}
 		return height;
+	}
+
+	//获取NavigationBar的高度：
+	public static int getNavigationBarHeight(Context context, WindowManager windowManager) {
+		int navigationBarHeight = 0;
+		Resources rs = context.getResources();
+		int id = rs.getIdentifier("navigation_bar_height", "dimen", "android");
+		if (id > 0 && hasSoftKeys(windowManager)) {
+			navigationBarHeight = rs.getDimensionPixelSize(id);
+		}
+		return navigationBarHeight;
+	}
+
+	/**
+	 * 判断是否有虚拟按钮
+	 */
+	@TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
+	public static boolean hasSoftKeys(WindowManager windowManager){
+		Display display = windowManager.getDefaultDisplay();
+
+		DisplayMetrics realDisplayMetrics = new DisplayMetrics();
+		display.getRealMetrics(realDisplayMetrics);
+
+		int realHeight = realDisplayMetrics.heightPixels;
+		int realWidth = realDisplayMetrics.widthPixels;
+
+		DisplayMetrics displayMetrics = new DisplayMetrics();
+		display.getMetrics(displayMetrics);
+
+		int displayHeight = displayMetrics.heightPixels;
+		int displayWidth = displayMetrics.widthPixels;
+		return (realWidth - displayWidth) > 0 || (realHeight - displayHeight) > 0;
 	}
 }
